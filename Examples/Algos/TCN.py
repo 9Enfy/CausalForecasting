@@ -60,8 +60,8 @@ def create_sliding_windows(data, window_size, forecast_horizon,number_of_entries
     return np.array(X), np.array(y)
 
 
-def split_train_test(X, y, _test_size, seed):
-    return train_test_split(X, y, test_size=_test_size, random_state=seed)
+def split_train_test(X, y, _test_size):
+    return train_test_split(X, y, test_size=_test_size)
 
 
     
@@ -175,6 +175,7 @@ def TCN(dataframe,features,target,number_of_entries,filters=64,kernel_size=3,WIN
     X_train = scaler.fit_transform(X_train.reshape(-1, X_train.shape[-1])).reshape(X_train.shape)
     X_test = scaler.transform(X_test.reshape(-1, X_test.shape[-1])).reshape(X_test.shape)
 
+    
     # Further split the training set into training and validation sets.
     # 80% of the training data is used for training, and 20% is used for validation.
     # This helps in tuning hyperparameters and assessing model performance during training.
