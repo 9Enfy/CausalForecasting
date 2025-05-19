@@ -61,6 +61,9 @@ def create_sliding_windows(data, window_size, forecast_horizon,number_of_entries
 
 
 def split_train_test(X, y, _test_size):
+    '''
+    Just an utility function so the main Test_TCN file does not have too many import.
+    '''
     return train_test_split(X, y, test_size=_test_size)
 
 
@@ -74,6 +77,8 @@ def create_TCN_model(size,_filters,_kernel_size,window_size):
     - size (int): The number of neurons in the last hidden layer. 
                   This determines the complexity and capacity of the model.
     - _filters (int): the dimension of the output space (the number of filters in the convolution)
+                        During the creation of the model (or the training) the initial weight of the model are set randomly. From testing the bigger the filters 
+                        is (>512 for example) the more different the result, made from different executions of the code, are from eachother. 
     - _kernel_size (int): specifying the size of the convolution window
     - window_size: number of hours used in a singular prediction
 
@@ -124,10 +129,26 @@ def create_TCN_model(size,_filters,_kernel_size,window_size):
 
     return model
 
-def Train_TCN_model(X_train_set,y_train_set,X_val,y_val,model,features,WINDOW_SIZE,FORECAST_HORIZON,_verbose=0):
+def Train_TCN_model(X_train_set,y_train_set,X_val,y_val,model,_verbose=0):
+    '''
+    Execute the training of the model
+
+    Parameters
+    ----------
+    - X_train_set (numpy.ndarray): input training data
+    - y_train_set (numpy.ndarray): target training data
+    - X_val (numpy.ndarray): input validation data
+    - y_val (numpy.ndarray): target validation data
+    - model (keras.src.models.sequential.Sequential): model in which the training is done
+    - _verbose (int): see fit method of keras. TLDR 1 to see output of the step of the training, 0 to not see.
+
+    Returns
+    ----------
+    - model (keras.src.models.sequential.Sequential): trained model
+    - history(keras.src.callbacks.history.History): 
+    '''
     # Create a model using the 'create_model_large' function.
     # This function defines the architecture of the model, which is set to be large in this case.
-    num_features = len(features)
     
     early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
     reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=1e-5)
@@ -137,6 +158,9 @@ def Train_TCN_model(X_train_set,y_train_set,X_val,y_val,model,features,WINDOW_SI
     return model,history
 
 def Predict_TCN_model(model,testData):
+    '''
+    
+    '''
     return model.predict(testData).reshape(1,-1)[0]
 
 def TCN(dataframe,features,target,number_of_entries,filters=64,kernel_size=3,WINDOW_SIZE=168,FORECAST_HORIZON=24):
